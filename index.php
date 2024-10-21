@@ -1,12 +1,12 @@
 <?php
 /**
  * @author Eloy
- * 
- * @version 2.0 
+ *
+ * @version 2.0
  */
  if(!empty($_POST)){
     echo '<div>';
-    $comp_dni = '/^\d{8}[a-zA-Z]{1}$/'; // 5 números seguidos de un guion y una letra
+    $comp_dni = '/^\d{8}[a-zA-Z]{1}$/'; // 8 números seguidos de una letra
     $comp_nombre = '/[a-zA-Z]{3,20}/';//letras min3 max20
     $comp_apellido1 = '/[a-zA-Z]{3,20}/';//letras min3 max20
     $comp_apellido2 = '/[a-zA-Z]{3,20}/';//letras min3 max20
@@ -15,7 +15,7 @@
     $comp_telefono='/[0-9]{9}/';//
     $comp_fecha='/^\d{1,2}-\d{1,2}-\d{4}$/';//fecha
     if(!preg_match($comp_dni, $_POST['dni'])){
-        echo 'el campo DNI no es aceptable, tiene que contener 23 numeros seguidos de una letra <br>';
+        echo 'el campo DNI no es aceptable, tiene que contener 8 numeros seguidos de una letra <br>';
         $error='error';
     }
     if(!preg_match($comp_nombre, $_POST['nombre'])){
@@ -27,10 +27,11 @@
         $error='error';
     }
     if(!preg_match($comp_apellido2, $_POST['apellido2'])){
-        
+       
         if(empty($_POST['apellido2'])){
 
-        }else{
+
+        } else {
             echo 'el campo Apellido no es aceptable, tiene que contener entre 3 y 20 letras<br>';
             $error='error';
         }
@@ -50,6 +51,88 @@
     if(!preg_match($comp_fecha, $_POST['fecha'])){
         echo 'el campo Fecha no es aceptable, tiene que seguir el formato DD-MM-AAAA usando "-"<br>';
         $error='error';
+    }
+   
+    /**
+     * Recorda el isset o si no falla
+     */
+    if(!empty($_FILES['fileDocum'])){
+        if (isset($_FILES['filePhoto']) && $_FILES['filePhoto']['error'] != UPLOAD_ERR_OK) {
+            $error='error';
+            echo 'Error: ';
+            switch ($_FILES['filePhoto']['error']) {
+                case UPLOAD_ERR_INI_SIZE:
+                case UPLOAD_ERR_FORM_SIZE:
+                    echo 'El fichero es demasiado pesado';
+                    break;
+                case UPLOAD_ERR_PARTIAL:
+                    echo 'El fichero no se ha podido subir por completo';
+                    break;
+                case UPLOAD_ERR_NO_FILE:
+                    echo 'No se ha subido ningún fichero';
+                    break;
+                default:
+                    echo 'Error indeterminado';
+                    break;
+            }
+        }
+            if ($_FILES['filePhoto']['type'] != 'image/jpeg' && $_FILES['filePhoto']['type'] != 'image/png') {
+                echo 'La imagen tiene que ser un jpg o un png';
+                $error = 'error';
+            }else{
+                /**
+                 * Recorda posar tmp_name per a que identifique el string del nom i revisar
+                 * Tambe gastar rutes absolutes
+                 */
+                if (is_uploaded_file($_FILES['filePhoto']['tmp_name'])===true) { 
+                    $rutaImagen = $_SERVER['DOCUMENT_ROOT'] .'/images/candidates/' . $_POST['dni'] . '.png';
+                    if (!move_uploaded_file($_FILES['filePhoto']['tmp_name'], $rutaImagen)) {
+                        echo 'Error: No se pudo guardar el fichero.<br>';
+                        $error = 'error';
+                    }
+                }
+            }
+
+    }else{
+    $error = 'error';
+    echo 'Tienes que introducir la imagen en formato png o jpg <br>';
+}
+    if(!empty($_FILES['fileDocum'])){
+        if (isset($_FILES['fileDocum']) && $_FILES['fileDocum']['error'] != UPLOAD_ERR_OK) {
+            $error='error';
+            echo 'Error: ';
+            switch ($_FILES['fileDocum']['error']) {
+                case UPLOAD_ERR_INI_SIZE:
+                case UPLOAD_ERR_FORM_SIZE:
+                    echo 'El fichero es demasiado pesado';
+                    break;
+                case UPLOAD_ERR_PARTIAL:
+                    echo 'El fichero no se ha podido subir por completo';
+                    break;
+                case UPLOAD_ERR_NO_FILE:
+                    echo 'No se ha subido ningún fichero';
+                    break;
+                    echo 'Error indeterminado';
+                    break;
+            }
+        }
+   
+        
+        if ($_FILES['fileDocum']['type'] != 'application/pdf') {
+            echo 'El documento tiene que ser un PDF';
+            $error = 'error';
+        }else{
+            if (is_uploaded_file($_FILES['fileDocum']['tmp_name'])===true) { 
+                $rutaDocum = $_SERVER['DOCUMENT_ROOT'] .'/cvs/' . $_POST['dni'] .'-'.$_POST['nombre'].'-'. $_POST['apellido1'].'.pdf';
+                if (!move_uploaded_file($_FILES['fileDocum']['tmp_name'], $rutaDocum)) {
+                    echo 'Error: No se pudo guardar el fichero.<br>';
+                    $error = 'error';
+            }
+        }
+    }
+    }else{
+        $error = 'error';
+        echo 'Tienes que introducir el curriculum en pdf <br>';
     }
 
 
@@ -78,6 +161,8 @@
     }
 }
 ?>
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -87,7 +172,8 @@
 </head>
 <body>
     <h1>Formulario</h1>
-    <form action="#" method="post">
+<!--                               recorda del [encrype="from-data"] o no pilla el archiu -->
+    <form action="#" method="post" enctype="multipart/form-data">
         <label for="dni">DNI</label>
         <input type="text" name="dni" id="dni" value="<?= (isset($_POST['dni']))?$_POST['dni']:''?>">
         <br>
@@ -112,6 +198,12 @@
         <label for="fecha">Fecha de nacimiento</label>
         <input type="text" name="fecha" id="fecha" value="<?= (isset($_POST['fecha']))?$_POST['fecha']:''?>">
         <br>
+        <label for="filePhoto">Introduce una imagen</label><br>
+        <input type="file" name="filePhoto" id="filePhoto">
+        <br>
+        <label for="fileDocum">Introduce un PDF del curriculum</label> <br>
+        <input type="file" name="fileDocum" id="fileDocum">
+        <br>
         <input type="submit" value="Enviar">
     </form>
     <br>
@@ -121,3 +213,4 @@
     </footer>
 </body>
 </html>
+
