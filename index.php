@@ -102,8 +102,7 @@
                         // Redimensionar la imagen original y copiarla a la nueva imagen
                         imagecopyresampled($newImage, $originalImage, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
                         // Guardar la miniatura como un archivo PNG
-                        imagepng($newImage, $_SERVER['DOCUMENT_ROOT'] . '/images/candidates/' . $_POST['dni'] . '-thumbnail.png');
-
+                        imagepng($newImage, $_SERVER['DOCUMENT_ROOT'] . '/images/candidates/peques/' . $_POST['dni'] . '-thumbnail.png');
                     }
                 }
             }
@@ -130,8 +129,7 @@
                     break;
             }
         }
-   
-        
+
         if ($_FILES['fileDocum']['type'] != 'application/pdf') {
             echo 'El documento tiene que ser un PDF';
             $error = 'error';
