@@ -89,10 +89,24 @@
                     if (!move_uploaded_file($_FILES['filePhoto']['tmp_name'], $rutaImagen)) {
                         echo 'Error: No se pudo guardar el fichero.<br>';
                         $error = 'error';
+                    }else{
+                        $originalImage = imagecreatefrompng('./images/candidates/' . $_POST['dni'] . '.png');
+                        // Obtener las dimensiones originales de la imagen
+                        $originalWidth = imagesx($originalImage);
+                        $originalHeight = imagesy($originalImage);
+                        // Calcular el nuevo tamaño (por ejemplo, la mitad del tamaño original)
+                        $newWidth = intval($originalWidth / 2);
+                        $newHeight = intval($originalHeight / 2);
+                        // Crear una nueva imagen con las nuevas dimensiones
+                        $newImage = imagecreatetruecolor($newWidth, $newHeight);
+                        // Redimensionar la imagen original y copiarla a la nueva imagen
+                        imagecopyresampled($newImage, $originalImage, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
+                        // Guardar la miniatura como un archivo PNG
+                        imagepng($newImage, $_SERVER['DOCUMENT_ROOT'] . '/images/candidates/' . $_POST['dni'] . '-thumbnail.png');
+
                     }
                 }
             }
-
     }else{
     $error = 'error';
     echo 'Tienes que introducir la imagen en formato png o jpg <br>';
