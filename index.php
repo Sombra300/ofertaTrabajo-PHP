@@ -76,8 +76,8 @@
                     break;
             }
         }
-            if ($_FILES['filePhoto']['type'] != 'image/jpeg' && $_FILES['filePhoto']['type'] != 'image/png') {
-                echo 'La imagen tiene que ser un jpg o un png';
+            if ($_FILES['filePhoto']['type'] != 'image/png') {
+                echo 'La imagen tiene que ser un png';
                 $error = 'error';
             }else{
                 /**
@@ -85,12 +85,12 @@
                  * Tambe gastar rutes absolutes
                  */
                 if (is_uploaded_file($_FILES['filePhoto']['tmp_name'])===true) { 
-                    $rutaImagen = $_SERVER['DOCUMENT_ROOT'] .'/images/candidates/' . $_POST['dni'] . '.png';
+                    $rutaImagen = $_SERVER['DOCUMENT_ROOT'] .'/images/candidates/original/' . $_POST['dni'] . '.png';
                     if (!move_uploaded_file($_FILES['filePhoto']['tmp_name'], $rutaImagen)) {
                         echo 'Error: No se pudo guardar el fichero.<br>';
                         $error = 'error';
                     }else{
-                        $originalImage = imagecreatefrompng('./images/candidates/' . $_POST['dni'] . '.png');
+                        $originalImage = imagecreatefrompng('./images/candidates/original' . $_POST['dni'] . '.png');
                         // Obtener las dimensiones originales de la imagen
                         $originalWidth = imagesx($originalImage);
                         $originalHeight = imagesy($originalImage);
@@ -108,7 +108,7 @@
             }
     }else{
     $error = 'error';
-    echo 'Tienes que introducir la imagen en formato png o jpg <br>';
+    echo 'Tienes que introducir la imagen en formato png<br>';
 }
     if(!empty($_FILES['fileDocum'])){
         if (isset($_FILES['fileDocum']) && $_FILES['fileDocum']['error'] != UPLOAD_ERR_OK) {
@@ -162,7 +162,8 @@
         <body>
             <h1>Registro completado correctmente</h1>
             <br>
-            <a href="indexEloy.php">Volver al inicio</a><br>
+            <a href="indexEloy.php">Volver al inicio</a>
+            <br>
             <a href="candidatos.php">Ver candidatos</a>
             <footer>
                 <div>Eloy Estevens Romero</div>
