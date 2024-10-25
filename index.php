@@ -162,7 +162,8 @@
         <body>
             <h1>Registro completado correctmente</h1>
             <br>
-            <a href="indexEloy.php">Volver al inicio</a><br>
+            <a href="indexEloy.php">Volver al inicio</a>
+            <br>
             <a href="candidatos.php">Ver candidatos</a>
             <footer>
                 <div>Eloy Estevens Romero</div>
